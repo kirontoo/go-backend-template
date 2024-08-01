@@ -1,1 +1,6 @@
-export GREENLIGHT_DB_DSN="postgres://greenlight:my_password_here@localhost/greenlight"
+export DB_DSN="postgres://greenlight:my_password_here@localhost/my-project"
+export SMTP_HOST="smtp.mailtrap.io"
+export SMTP_PORT=24
+export SMTP_USERNAME="smtp-username"
+export SMTP_PASSWORD="smtp-password"
+export SMTP_SENDER="my-project <no-reply@myrpoject.example.net>"
