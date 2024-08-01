@@ -4,7 +4,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 )
 
 type Filters struct {

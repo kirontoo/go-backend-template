@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kirontoo/greenlight/internal/data"
-	"github.com/kirontoo/greenlight/internal/jsonlog"
-	"github.com/kirontoo/greenlight/internal/mailer"
-	"github.com/kirontoo/greenlight/internal/vcs"
+	"github.com/kirontoo/go-backend-template/internal/data"
+	"github.com/kirontoo/go-backend-template/internal/jsonlog"
+	"github.com/kirontoo/go-backend-template/internal/mailer"
+	"github.com/kirontoo/go-backend-template/internal/vcs"
 	_ "github.com/lib/pq"
 )
 
@@ -65,7 +65,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 
-	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("GREENLIGHT_DB_DSN"), "PostgresSQL DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgresSQL DSN")
 
 	// postgres options
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgresSQL max open connections")
@@ -81,9 +81,9 @@ func main() {
 	// Mailtrap settings as the default values.
 	flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.mailtrap.io", "SMTP host")
 	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "ffef06a028db7e", "SMTP username")
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "58d34de4761169", "SMTP password")
-	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.alexedwards.net>", "SMTP sender")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "My-Project <no-reply@myproject.example.net>", "SMTP sender")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
 		cfg.cors.trustedOrigins = strings.Fields(val)

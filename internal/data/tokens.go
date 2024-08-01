@@ -8,7 +8,7 @@ import (
 	"encoding/base32"
 	"time"
 
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 )
 
 const (

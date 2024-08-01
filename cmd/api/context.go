@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/kirontoo/greenlight/internal/data"
+	"github.com/kirontoo/go-backend-template/internal/data"
 )
 
 type contextKey string

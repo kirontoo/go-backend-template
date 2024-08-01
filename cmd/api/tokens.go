@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kirontoo/greenlight/internal/data"
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/data"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 )
 
 // POST v1/tokens/authentication

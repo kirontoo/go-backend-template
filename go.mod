@@ -1,4 +1,4 @@
-module github.com/kirontoo/greenlight
+module github.com/kirontoo/go-backend-template
 
 go 1.22.5
 

@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 )
 
 func (app *application) readIDParam(r *http.Request) (int64, error) {

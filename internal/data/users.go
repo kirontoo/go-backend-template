@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 

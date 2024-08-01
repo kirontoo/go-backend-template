@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kirontoo/greenlight/internal/validator"
+	"github.com/kirontoo/go-backend-template/internal/validator"
 	"github.com/lib/pq"
 )
 
