@@ -26,6 +26,7 @@ run/api:
 
 # run/api/help: list all environment variables available for cmd/api application
 .PHONY: run/api/help
+run/api/help:
 	go run ./cmd/api -help
 
 ## db/psql: connect to the database using psql
