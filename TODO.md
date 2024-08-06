@@ -16,3 +16,6 @@
 - [ ] figure out how to run commands within docker for [migrations](https://github.com/golang-migrate/migrate) + [staticcheck](https://staticcheck.dev/)
 - [ ] setup auto migrations with go-embed - [article](https://oscarforner.com/blog/2023-10-10-go-embed-for-migrations/)
 - [ ] generate cert for  SSL + add instructions
+- [x] create docker containers
+- [ ] readme docs for [vsc versioning](./internal/vcs/)
+- [x] readme: getting started
