@@ -24,6 +24,10 @@ confirm:
 run/api:
 	@go run ./cmd/api -db-dsn=${DB_DSN}
 
+# run/api/help: list all environment variables available for cmd/api application
+.PHONY: run/api/help
+	go run ./cmd/api -help
+
 ## db/psql: connect to the database using psql
 .PHONY: db/psql
 db/psql:
@@ -80,11 +84,11 @@ build/api:
 # ==================================================================================== #
 
 
-## TODO: replace 'production_host_ip' with your production server's IP
+# TODO: replace 'production_host_ip' with your production server's IP
 production_host_ip = '161.35.71.158'
 
-## TODO: replace 'project_name' with your project name
 ## production/connect: connect to the production server
+# TODO: replace 'project_name' with your project name
 .PHONY: production/connect
 production/connect:
 	ssh project_name@${production_host_ip}
