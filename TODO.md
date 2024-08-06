@@ -1,6 +1,6 @@
 # Migrating to a backend template TODOs
 
-- [ ] refactor middleware
+- [x] refactor middleware
 - [ ] SMTP: re-roll credentials, accidentally saved them in the other repo
 - [ ] docker: create a new database with permissions
 - [ ] remove movies migrations
@@ -15,3 +15,4 @@
 - [ ] docs on how versioning works
 - [ ] figure out how to run commands within docker for [migrations](https://github.com/golang-migrate/migrate) + [staticcheck](https://staticcheck.dev/)
 - [ ] setup auto migrations with go-embed - [article](https://oscarforner.com/blog/2023-10-10-go-embed-for-migrations/)
+- [ ] generate cert for  SSL + add instructions

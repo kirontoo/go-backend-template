@@ -324,3 +324,17 @@ func (app *application) metrics(next http.Handler) http.Handler {
 		totalProcesingTimeMicroseconds.Add(duration)
 	})
 }
+
+type Middleware func(http.Handler) http.Handler
+
+// nest middleware for code readability
+func CreateNestedMiddlewareStack(stack ...Middleware) Middleware {
+	return func(next http.Handler) http.Handler {
+		for i := len(stack) - 1; i >= 0; i-- {
+			x := stack[i]
+			next = x(next)
+		}
+
+		return next
+	}
+}

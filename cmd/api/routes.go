@@ -30,5 +30,11 @@ func (app *application) routes() http.Handler {
 	// restrict access to this endpoint in production
 	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
 
-	return app.metrics(app.recoverPanic(app.enableCORS(app.rateLimit(app.authenticate(router)))))
+	return CreateNestedMiddlewareStack(
+		app.metrics,
+		app.recoverPanic,
+		app.enableCORS,
+		app.rateLimit,
+		app.authenticate,
+	)(router)
 }
