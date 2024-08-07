@@ -38,13 +38,31 @@ db/psql:
 .PHONY: db/migrations/new
 db/migrations/new:
 	@echo 'Creating migration files for ${name}...'
-	migrate create -seq -ext=.sql -dir=./migrations ${name}
+	migrate create -seq -ext=.sql -dir=./migrations/tables ${name}
 
 ## db/migrations/up: apply all up database migrations
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	migrate -path ./migrations -database ${DB_DSN} up
+	migrate -path ./migrations/tables -database ${DB_DSN} up
+
+## db/migrations/down n=$1: Apply n down migrations
+.PHONY: db/migrations/down
+db/migrations/down: confirm
+	@echo 'Running down migrations...'
+	migrate -path ./migrations/tables -database ${DB_DSN} down ${n}
+
+## db/migrations/foce-version version=$1: force fix dirty database
+.PHONY: db/migrations/force-version
+db/migrations/force-version: confirm
+	@echo "Force fixing dirty database"
+	migrate -path ./migrations/tables -database ${DB_DSN} force ${version}
+
+## db/migrations/drop: Drop everything inside the database
+.PHONY: db/migrations/drop
+db/migrations/drop: confirm
+	@echo 'Dropping everything inside database'	
+	migrate -path ./migrations/tables -database ${DB_DSN} drop
 
 # ==================================================================================== #
 # QUALITY CONTROL
@@ -59,8 +77,9 @@ audit: vendor
 	go vet ./...
 	staticcheck ./...
 	@echo 'Running tests...'
-	go test -race -vet=off ./...## vendor: tidy and vendor dependencies
+	go test -race -vet=off ./...
 
+## vendor: tidy and vendor dependencies
 .PHONY: vendor
 vendor:
 	@echo 'Tidying and verifying module dependencies...'
