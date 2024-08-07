@@ -16,6 +16,11 @@ import (
 	"github.com/kirontoo/go-backend-template/internal/jsonlog"
 	"github.com/kirontoo/go-backend-template/internal/mailer"
 	"github.com/kirontoo/go-backend-template/internal/vcs"
+	"github.com/kirontoo/go-backend-template/migrations"
+
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/lib/pq"
 )
 
@@ -150,6 +155,24 @@ func openDB(cfg config) (*sql.DB, error) {
 	}
 
 	db.SetConnMaxIdleTime(duration)
+
+	driver, err := iofs.New(migrations.MigrationFiles, "tables")
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	migrations, err := migrate.NewWithSourceInstance("iofs", driver, cfg.db.dsn)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	err = migrations.Up()
+	if err != nil && err.Error() != "no change" {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	// create context with a 5 second timeout deadline
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
