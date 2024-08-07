@@ -52,13 +52,13 @@ db/migrations/down: confirm
 	@echo 'Running down migrations...'
 	migrate -path ./migrations/tables -database ${DB_DSN} down ${n}
 
-## db/migrations/foce-version version=$1: force fix dirty database
+## db/migrations/force-version version=$1: force fix dirty database
 .PHONY: db/migrations/force-version
 db/migrations/force-version: confirm
 	@echo "Force fixing dirty database"
 	migrate -path ./migrations/tables -database ${DB_DSN} force ${version}
 
-## db/migrations/drop: Drop everything inside the database
+## db/migrations/drop: drop everything inside the database
 .PHONY: db/migrations/drop
 db/migrations/drop: confirm
 	@echo 'Dropping everything inside database'	
