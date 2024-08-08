@@ -16,7 +16,7 @@
 - [ ] remove movie routes
 - [ ] add tests for authentication
 - [x] setup auto migrations with go-embed - [article](https://oscarforner.com/blog/2023-10-10-go-embed-for-migrations/)
-- [ ] create flag for auto-migrate
+- [x] create flag for auto-migrate
 - [ ] generate cert for  SSL + add instructions
 
 ## Docker & DB

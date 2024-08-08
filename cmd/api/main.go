@@ -36,6 +36,7 @@ type config struct {
 		maxOpenConns int
 		maxIdleConns int
 		maxIdleTime  string
+		autoMigrate  bool
 	}
 
 	limiter struct {
@@ -71,6 +72,8 @@ func main() {
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgresSQL DSN")
+
+	flag.BoolVar(&cfg.db.autoMigrate, "auto-migrate", false, "Auto migrate database")
 
 	// postgres options
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgresSQL max open connections")
@@ -156,22 +159,24 @@ func openDB(cfg config) (*sql.DB, error) {
 
 	db.SetConnMaxIdleTime(duration)
 
-	driver, err := iofs.New(migrations.MigrationFiles, "tables")
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
+	if cfg.db.autoMigrate {
+		driver, err := iofs.New(migrations.MigrationFiles, "tables")
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 
-	migrations, err := migrate.NewWithSourceInstance("iofs", driver, cfg.db.dsn)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
+		migrations, err := migrate.NewWithSourceInstance("iofs", driver, cfg.db.dsn)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 
-	err = migrations.Up()
-	if err != nil && err.Error() != "no change" {
-		fmt.Println(err)
-		return nil, err
+		err = migrations.Up()
+		if err != nil && err.Error() != "no change" {
+			fmt.Println(err)
+			return nil, err
+		}
 	}
 
 	// create context with a 5 second timeout deadline
