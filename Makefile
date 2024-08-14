@@ -24,7 +24,7 @@ confirm:
 run/api:
 	@go run ./cmd/api -db-dsn=${DB_DSN} ${args}
 
-# run/api/help: list all environment variables available for application
+## run/api/help: list all environment variables available for application
 .PHONY: run/api/help
 run/api/help:
 	go run ./cmd/api -help
