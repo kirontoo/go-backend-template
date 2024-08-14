@@ -36,6 +36,7 @@ type config struct {
 		maxOpenConns int
 		maxIdleConns int
 		maxIdleTime  string
+		autoMigrate  bool
 	}
 
 	limiter struct {
@@ -51,6 +52,7 @@ type config struct {
 		password string
 		sender   string
 	}
+
 	cors struct {
 		trustedOrigins []string
 	}
@@ -71,6 +73,7 @@ func main() {
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgresSQL DSN")
+	flag.BoolVar(&cfg.db.autoMigrate, "auto-migrate", false, "Auto migrate database on server start")
 
 	// postgres options
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgresSQL max open connections")
@@ -162,16 +165,20 @@ func openDB(cfg config) (*sql.DB, error) {
 		return nil, err
 	}
 
-	migrations, err := migrate.NewWithSourceInstance("iofs", driver, cfg.db.dsn)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
+	if cfg.db.autoMigrate {
+		migrations, err := migrate.NewWithSourceInstance("iofs", driver, cfg.db.dsn)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 
-	err = migrations.Up()
-	if err != nil && err.Error() != "no change" {
-		fmt.Println(err)
-		return nil, err
+		err = migrations.Up()
+		if err != nil && err.Error() != "no change" {
+			fmt.Println(err)
+			return nil, err
+		} else if err != nil && err.Error() == "no change" {
+			fmt.Println("migrations were applied")
+		}
 	}
 
 	// create context with a 5 second timeout deadline
