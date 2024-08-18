@@ -14,6 +14,7 @@ import (
 const (
 	ScopeActivation     = "activation"
 	ScopeAuthentication = "authentication"
+	ScopePasswordReset = "password-reset"
 )
 
 // only the Plaintext and Expiry field will be included when encoding a Token
