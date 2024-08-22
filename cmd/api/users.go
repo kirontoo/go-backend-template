@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/kirontoo/go-backend-template/internal/data"
 	"github.com/kirontoo/go-backend-template/internal/validator"
@@ -74,7 +73,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.ScopeActivation)
+	token, err := app.models.Tokens.NewActivationToken(user.ID)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
