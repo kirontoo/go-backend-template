@@ -126,7 +126,7 @@ RETURNING id, created_at, version
 
 	args := []any{user.Name, user.Email, user.Password.hash, user.Activated}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Version)
@@ -151,7 +151,7 @@ WHERE email = $1
 
 	var user User
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, email).Scan(
@@ -192,7 +192,7 @@ RETURNING version`
 		user.Version,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&user.Version)
@@ -233,7 +233,7 @@ AND tokens.expiry > $3`
 	args := []any{tokenHash[:], tokenScope, time.Now()}
 
 	var user User
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	// Execute the query, scanning the return values into a User struct. If no matching

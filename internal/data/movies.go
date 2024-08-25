@@ -75,7 +75,7 @@ func (m MovieModel) Get(id int64) (*Movie, error) {
 	movie := &Movie{}
 
 	// connection should time out after it hangs for 3 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(
@@ -117,7 +117,7 @@ RETURNING version`
 	}
 
 	// connection should time out after it hangs for 3 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	err := m.DB.QueryRowContext(ctx, query, args...).Scan(&movie.Version)
@@ -142,7 +142,7 @@ DELETE FROM movies
 WHERE id = $1`
 
 	// connection should time out after it hangs for 3 seconds
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	result, err := m.DB.ExecContext(ctx, query, id)
@@ -173,7 +173,7 @@ func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*M
 		filters.sortDirection(),
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ThreeSecondTimeout)
 	defer cancel()
 
 	args := []any{title, pq.Array(genres), filters.limit(), filters.offset()}

@@ -3,11 +3,13 @@ package data
 import (
 	"database/sql"
 	"errors"
+	"time"
 )
 
 var (
-	ErrRecordNotFound = errors.New("record not found")
-	ErrEditConflict   = errors.New("edit conflict")
+	ErrRecordNotFound  = errors.New("record not found")
+	ErrEditConflict    = errors.New("edit conflict")
+	ThreeSecondTimeout = 3 * time.Second
 )
 
 type Models struct {
