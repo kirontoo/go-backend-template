@@ -160,7 +160,7 @@ func openDB(cfg config) (*sql.DB, error) {
 	db.SetConnMaxIdleTime(duration)
 
 	if cfg.db.autoMigrate {
-		driver, err := iofs.New(migrations.MigrationFiles, "migrations")
+		driver, err := iofs.New(migrations.MigrationFiles, "tables")
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
