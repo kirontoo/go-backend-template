@@ -14,6 +14,7 @@ import (
 const (
 	ScopeActivation     = "activation"
 	ScopeAuthentication = "authentication"
+	ScopePasswordReset  = "password-reset"
 )
 
 // only the Plaintext and Expiry field will be included when encoding a Token
@@ -89,6 +90,10 @@ func (m TokenModel) New(userID int64, ttl time.Duration, scope string) (*Token, 
 
 	err = m.Insert(token)
 	return token, err
+}
+
+func (m TokenModel) NewActivationToken(userID int64) (*Token, error) {
+	return m.New(userID, 3*24*time.Hour, ScopeActivation)
 }
 
 // Insert() adds the data for a specific token to the tokens table.

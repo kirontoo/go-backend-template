@@ -19,12 +19,12 @@ confirm:
 # DEVELOPMENT
 # ==================================================================================== #
 
-## run/api: run the cmd/api application
+## run/api args=$1: run the cmd/api application (optional arguments)
 .PHONY: run/api
 run/api:
-	@go run ./cmd/api -db-dsn=${DB_DSN}
+	@go run ./cmd/api -db-dsn=${DB_DSN} ${args}
 
-# run/api/help: list all environment variables available for cmd/api application
+## run/api/help: list all environment variables available for application
 .PHONY: run/api/help
 run/api/help:
 	go run ./cmd/api -help
