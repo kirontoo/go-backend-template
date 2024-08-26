@@ -75,8 +75,6 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("DB_DSN"), "PostgresSQL DSN")
 	flag.BoolVar(&cfg.db.autoMigrate, "auto-migrate", false, "Auto migrate database on server start")
 
-	flag.BoolVar(&cfg.db.autoMigrate, "auto-migrate", false, "Auto migrate database")
-
 	// postgres options
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgresSQL max open connections")
 	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgresSQL max idle connections")
