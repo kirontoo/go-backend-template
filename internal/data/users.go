@@ -45,6 +45,11 @@ type password struct {
 	hash      []byte
 }
 
+type Password interface {
+	Set(plaintextPassword string) error
+	Matches(plaintextPassword string) (bool, error)
+}
+
 // The Set() method calculates the bcrypt hash of a plaintext password, and stores both
 // the hash and the plaintext versions in the struct.
 func (p *password) Set(plaintextPassword string) error {
@@ -115,6 +120,7 @@ type Users interface {
 	Insert(user *User) error
 	GetByEmail(email string) (*User, error)
 	Update(user *User) error
+	GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 }
 
 func (m UserModel) Insert(user *User) error {

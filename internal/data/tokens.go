@@ -27,6 +27,13 @@ type Token struct {
 	Scope     string    `json:"-"`
 }
 
+type Tokens interface {
+	DeleteAllForUser(scope string, userID int64) error
+	Insert(token *Token) error
+	New(userID int64, ttl time.Duration, scope string) (*Token, error)
+	NewActivationToken(userID int64) (*Token, error)
+}
+
 func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
 	// Create a Token instance containing the user ID, expiry, and scope information.
 	// Notice that we add the provided ttl (time-to-live) duration parameter to the

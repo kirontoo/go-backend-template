@@ -8,10 +8,15 @@ import (
 )
 
 // "movies:read" and "movies:write") for a single user.
-type Permissions []string
+type PermissionList []string
+
+type Permissions interface {
+	AddForUser(userID int64, codes ...string) error
+	GetAllForUser(userID int64) (PermissionList, error)
+}
 
 // to check whether the Permissions slice contains a specific permission code.
-func (p Permissions) Include(code string) bool {
+func (p PermissionList) Include(code string) bool {
 	for i := range p {
 		if code == p[i] {
 			return true
@@ -26,7 +31,7 @@ type PermissionModel struct {
 
 // The GetAllForUser() method returns all permission codes for a specific user in a
 // Permissions slice.
-func (m PermissionModel) GetAllForUser(userID int64) (Permissions, error) {
+func (m PermissionModel) GetAllForUser(userID int64) (PermissionList, error) {
 	query := `
 SELECT permissions.code
 FROM permissions
@@ -43,7 +48,7 @@ WHERE users.id = $1`
 	}
 	defer rows.Close()
 
-	var permissions Permissions
+	var permissions PermissionList
 
 	for rows.Next() {
 		var permission string
