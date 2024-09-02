@@ -2,33 +2,25 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/kirontoo/go-backend-template/internal/assert"
-	"github.com/kirontoo/go-backend-template/internal/jsonlog"
 )
 
-func TestCheckHealthHandler(t *testing.T) {
-	response := httptest.NewRecorder()
+func TestCheckHealthWithApp(t *testing.T) {
+	app := newTestApplication(t)
 
-	request, err := http.NewRequest(http.MethodGet, "/", nil)
+	ts := httptest.NewServer(app.routes())
+	defer ts.Close()
+
+	rs, err := ts.Client().Get(ts.URL + "/v1/healthcheck")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	logger := jsonlog.New(io.Discard, jsonlog.LevelInfo)
-	app := &application{
-		logger: logger,
-	}
-
-	app.healthcheckHandler(response, request)
-
-	result := response.Result()
-
-	assert.Status(t, result.StatusCode, http.StatusOK)
+	assert.Equal(t, rs.StatusCode, http.StatusOK)
 
 	type jsonResponseBody struct {
 		Status     string
@@ -39,10 +31,10 @@ func TestCheckHealthHandler(t *testing.T) {
 	}
 
 	var body jsonResponseBody
-	err = json.NewDecoder(response.Body).Decode(&body)
+	err = json.NewDecoder(rs.Body).Decode(&body)
 
 	if err != nil {
-		t.Fatalf("Unable to parse response from server %q into body, '%v'", response.Body, err)
+		t.Fatalf("Unable to parse response from server %q into body, '%v'", rs.Body, err)
 	}
 
 	assert.Equal(t, body.Status, "available")
