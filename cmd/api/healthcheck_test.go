@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/kirontoo/go-backend-template/internal/assert"
@@ -12,30 +11,26 @@ import (
 func TestCheckHealthWithApp(t *testing.T) {
 	app := newTestApplication(t)
 
-	ts := httptest.NewServer(app.routes())
+	ts := newTestServer(t, app.routes())
 	defer ts.Close()
 
-	rs, err := ts.Client().Get(ts.URL + "/v1/healthcheck")
-	if err != nil {
-		t.Fatal(err)
-	}
+	code, _, body := ts.get(t, "/v1/healthcheck")
 
-	assert.Equal(t, rs.StatusCode, http.StatusOK)
+	assert.Equal(t, code, http.StatusOK)
 
-	type jsonResponseBody struct {
-		Status     string
+	type healthCheckResponseBody struct {
+		Status     string `json:"status"`
 		SystemInfo struct {
 			environment string
 			version     string
 		} `json:"system_info"`
 	}
 
-	var body jsonResponseBody
-	err = json.NewDecoder(rs.Body).Decode(&body)
+	var actual healthCheckResponseBody
+	if err := json.Unmarshal([]byte(body), &actual); err != nil {
 
-	if err != nil {
-		t.Fatalf("Unable to parse response from server %q into body, '%v'", rs.Body, err)
+		t.Fatalf("Unable to parse response from server %q into body, '%v'", body, err)
 	}
 
-	assert.Equal(t, body.Status, "available")
+	assert.Equal(t, actual.Status, "available")
 }
