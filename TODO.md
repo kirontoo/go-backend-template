@@ -7,14 +7,15 @@
 
 ## Clean up & Refactor
 - [x] refactor middleware
-- [ ] SMTP: re-roll credentials, accidentally saved them in the other repo
+- [x] SMTP: re-roll credentials, accidentally saved them in the other repo
 - [ ] remove movies migrations
 - [ ] migrate to new net/http routing
-- [ ] add CORS_TRUSTED_ORIGINS to env file
+- [x] add CORS_TRUSTED_ORIGINS to env file
 
 ## New Features
 - [ ] remove movie routes
 - [ ] add tests for authentication
+    - check out mockery for mock data?
 - [x] setup auto migrations with go-embed - [article](https://oscarforner.com/blog/2023-10-10-go-embed-for-migrations/)
 - [x] create flag for auto-migrate
 - [ ] generate cert for  SSL + add instructions
@@ -26,5 +27,12 @@
 - [ ] figure out how to run commands within docker for [migrations](https://github.com/golang-migrate/migrate) + [staticcheck](https://staticcheck.dev/)
 
 ## Authentication and authorization
-- [ ] endpoint for adding additional activation tokens (see book) 
-- [ ] add option for users to reset password (see book)
+- [x] endpoint for adding additional activation tokens (see book) 
+- [x] add option for users to reset password (see book)
+
+
+## ???
+- update docker for testing environment (based on "env" varaible -> development|staging|production)
+
+## Testing
+- [] clean up test for require permissions middleware
