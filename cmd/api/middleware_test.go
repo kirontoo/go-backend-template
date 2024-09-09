@@ -38,7 +38,6 @@ func TestRequirePermission(t *testing.T) {
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
 		rs := rr.Result()
-		t.Log(rs)
 
 		assert.Equal(t, rs.StatusCode, http.StatusOK)
 
@@ -71,7 +70,6 @@ func TestRequirePermission(t *testing.T) {
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
 		rs := rr.Result()
-		t.Log(rs)
 
 		assert.Equal(t, rs.StatusCode, http.StatusForbidden)
 	})
@@ -103,7 +101,6 @@ func TestRequirePermission(t *testing.T) {
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
 		rs := rr.Result()
-		t.Log(rs)
 
 		assert.Equal(t, rs.StatusCode, http.StatusForbidden)
 	})
