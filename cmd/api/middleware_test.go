@@ -105,3 +105,116 @@ func TestRequirePermission(t *testing.T) {
 		assert.Equal(t, rs.StatusCode, http.StatusForbidden)
 	})
 }
+
+func TestAuthenticatedUser(t *testing.T) {
+	t.Run("should send 401 if user is not authenticated", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr := httptest.NewRecorder()
+
+		r, err := http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		user := data.AnonymousUser
+
+		ctx := context.WithValue(r.Context(), userContextKey, user)
+		r = r.WithContext(ctx)
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.requireAuthenticatedUser(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		assert.Equal(t, rs.StatusCode, http.StatusUnauthorized)
+	})
+
+	t.Run("should send 401 if user is not authenticated", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr := httptest.NewRecorder()
+
+		r, err := http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		user := &data.User{
+			ID:        3,
+			Activated: false,
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, user)
+		r = r.WithContext(ctx)
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.requireAuthenticatedUser(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		assert.Equal(t, rs.StatusCode, http.StatusOK)
+	})
+}
+
+func TestRequireActivatedUser(t *testing.T) {
+	t.Run("user is activated", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr := httptest.NewRecorder()
+
+		r, err := http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		user := &data.User{
+			ID:        1,
+			Activated: true,
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, user)
+		r = r.WithContext(ctx)
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.requireActivatedUser(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		assert.Equal(t, rs.StatusCode, http.StatusOK)
+	})
+
+	t.Run("user is not activated", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr := httptest.NewRecorder()
+
+		r, err := http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		user := &data.User{
+			ID:        3,
+			Activated: false,
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, user)
+		r = r.WithContext(ctx)
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.requireActivatedUser(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		assert.Equal(t, rs.StatusCode, http.StatusForbidden)
+	})
+}
