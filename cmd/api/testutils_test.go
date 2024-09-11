@@ -17,8 +17,14 @@ func newTestApplication(t testing.TB) *application {
 	t.Helper()
 
 	logger := jsonlog.New(io.Discard, jsonlog.LevelInfo)
+
+	config := config{}
+
+	config.cors.trustedOrigins = []string{"http://localhost:9000"}
+
 	return &application{
 		logger: logger,
+		config: config,
 		models: data.Models{
 			Movies:      mocks.MovieModel{},
 			Permissions: mocks.PermisionModel{},

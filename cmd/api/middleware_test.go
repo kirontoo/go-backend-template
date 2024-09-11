@@ -159,3 +159,83 @@ func TestRequireActivatedUser(t *testing.T) {
 		assert.Equal(t, rs.StatusCode, http.StatusForbidden)
 	})
 }
+
+func TestEnableCORS(t *testing.T) {
+	t.Run("sets the 'Vary' header", func(t *testing.T) {
+
+		app := newTestApplication(t)
+		rr, r := setupRecorder(t)
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.enableCORS(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		expectedVaryValues := []string{"Origin", "Access-Control-Allow-Origin"}
+		assert.HeaderValuesEquals(t, rs, "Vary", expectedVaryValues)
+	})
+
+	t.Run("should set Access-Control-Allow-Origin header on trusted origin", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr, r := setupRecorder(t)
+
+		// set origin header
+		r.Header.Set("Origin", "http://localhost:9000")
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.enableCORS(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		expectedVaryValues := []string{"Origin", "Access-Control-Allow-Origin"}
+		assert.HeaderValuesEquals(t, rs, "Vary", expectedVaryValues)
+
+		expectedOrigin := "http://localhost:9000"
+		assert.HeaderEquals(t, rs, "Access-Control-Allow-Origin", expectedOrigin)
+	})
+
+	t.Run("should not set Access-Control-Allow-Origin header on untrusted Origin", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr, r := setupRecorder(t)
+
+		// set origin header
+		r.Header.Set("Origin", "http://localhost:4000")
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.enableCORS(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		expectedOrigin := "http://localhost:4000"
+		assert.HeaderNotEqual(t, rs, "Access-Control-Allow-Origin", expectedOrigin)
+		assert.Equal(t, rs.StatusCode, http.StatusOK)
+	})
+
+	t.Run("should set headers for pre-flight request on trusted origin", func(t *testing.T) {
+		app := newTestApplication(t)
+		rr, r := setupRecorder(t)
+
+		r.Method = http.MethodOptions
+		r.Header.Set("Origin", "http://localhost:9000")
+		r.Header.Set("OPTIONS", "GET")
+		r.Header.Set("Access-Control-Request-Method", "PUT")
+
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("OK"))
+		})
+
+		app.enableCORS(next).ServeHTTP(rr, r)
+
+		rs := rr.Result()
+
+		assert.HeaderEquals(t, rs, "Access-Control-Allow-Methods", "OPTIONS, PUT, PATCH, DELETE")
+		assert.HeaderEquals(t, rs, "Access-Control-Allow-Headers", "Authorization, Content-Type")
+	})
+}

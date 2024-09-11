@@ -81,3 +81,29 @@ func HeaderEquals(t testing.TB, response *http.Response, header string, expected
 		t.Errorf("Header '%v' got: %v, want: %v", header, actual, expected)
 	}
 }
+
+func HeaderNotEqual(t testing.TB, response *http.Response, header string, expected string) {
+	t.Helper()
+
+	actual := response.Header.Get(header)
+	if actual == expected {
+		t.Errorf("Header '%v' got: %v, want: %v", header, actual, expected)
+	}
+}
+
+func HeaderValuesEquals(t testing.TB, response *http.Response, header string, expected []string) {
+	// fields := strings.Split(response.Header.Values(header), ",")
+	fields := response.Header.Values(header)
+	if len(fields) != len(expected) {
+		t.Errorf("Header '%v' returns %v values instead of %v", header, len(fields), len(expected))
+	}
+
+	for i, field := range fields {
+		fields[i] = strings.Trim(field, " ")
+		if i < len(expected) {
+			if fields[i] != expected[i] {
+				t.Errorf("Header 'Vary' got: %v, want: %v", fields[i], expected[i])
+			}
+		}
+	}
+}
