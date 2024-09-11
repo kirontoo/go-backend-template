@@ -3,37 +3,41 @@ package main
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/kirontoo/go-backend-template/internal/assert"
 	"github.com/kirontoo/go-backend-template/internal/data"
 )
 
+func setupMockRouteWithUserContext(
+	t testing.TB,
+	r *http.Request,
+	user *data.User,
+) (http.HandlerFunc, *http.Request) {
+	t.Helper()
+
+	ctx := context.WithValue(r.Context(), userContextKey, user)
+	r = r.WithContext(ctx)
+
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("OK"))
+	})
+
+	return next, r
+}
+
 func TestRequirePermission(t *testing.T) {
 	t.Run("user activated", func(t *testing.T) {
 		app := newTestApplication(t)
 
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        1,
 			Activated: true,
 		}
 
-		// mock context
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		// mock HTTP Handler to pass to RequirePermissions middleware
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
@@ -46,26 +50,14 @@ func TestRequirePermission(t *testing.T) {
 	t.Run("user not activated", func(t *testing.T) {
 		app := newTestApplication(t)
 
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        1,
 			Activated: false,
 		}
 
-		// mock context
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		// mock HTTP Handler to pass to RequirePermissions middleware
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
@@ -77,26 +69,14 @@ func TestRequirePermission(t *testing.T) {
 	t.Run("user does not have permission", func(t *testing.T) {
 		app := newTestApplication(t)
 
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        3,
 			Activated: false,
 		}
 
-		// mock context
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		// mock HTTP Handler to pass to RequirePermissions middleware
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requirePermission("movies:read", next).ServeHTTP(rr, r)
 
@@ -109,21 +89,12 @@ func TestRequirePermission(t *testing.T) {
 func TestAuthenticatedUser(t *testing.T) {
 	t.Run("should send 401 if user is not authenticated", func(t *testing.T) {
 		app := newTestApplication(t)
-		rr := httptest.NewRecorder()
 
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := data.AnonymousUser
 
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requireAuthenticatedUser(next).ServeHTTP(rr, r)
 
@@ -132,26 +103,16 @@ func TestAuthenticatedUser(t *testing.T) {
 		assert.Equal(t, rs.StatusCode, http.StatusUnauthorized)
 	})
 
-	t.Run("should send 401 if user is not authenticated", func(t *testing.T) {
+	t.Run("should send 200 if user is authenticated", func(t *testing.T) {
 		app := newTestApplication(t)
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        3,
 			Activated: false,
 		}
 
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requireAuthenticatedUser(next).ServeHTTP(rr, r)
 
@@ -164,24 +125,14 @@ func TestAuthenticatedUser(t *testing.T) {
 func TestRequireActivatedUser(t *testing.T) {
 	t.Run("user is activated", func(t *testing.T) {
 		app := newTestApplication(t)
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        1,
 			Activated: true,
 		}
 
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requireActivatedUser(next).ServeHTTP(rr, r)
 
@@ -192,24 +143,14 @@ func TestRequireActivatedUser(t *testing.T) {
 
 	t.Run("user is not activated", func(t *testing.T) {
 		app := newTestApplication(t)
-		rr := httptest.NewRecorder()
-
-		r, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		rr, r := setupRecorder(t)
 
 		user := &data.User{
 			ID:        3,
 			Activated: false,
 		}
 
-		ctx := context.WithValue(r.Context(), userContextKey, user)
-		r = r.WithContext(ctx)
-
-		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
-		})
+		next, r := setupMockRouteWithUserContext(t, r, user)
 
 		app.requireActivatedUser(next).ServeHTTP(rr, r)
 
